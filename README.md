@@ -7,9 +7,9 @@ The main project repository for CSCE 3513 - Software Engineering. This contains 
 
 ## How to use
 
-Make sure Python is installed
-install supabase to utilize client Library : pip install supabase
-Currently, there is no executable code as we still need to develop the separate parts of the program before we can combine.
+-Make sure Python is installed
+-install supabase to utilize client Library : pip install supabase
+-Currently, there is no executable code as we still need to develop the separate parts of the program before we can combine.
 
 ## Road Map
 
