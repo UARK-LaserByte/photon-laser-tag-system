@@ -7,10 +7,12 @@ The main project repository for CSCE 3513 - Software Engineering. This contains 
 
 ## How to use
 
+**Install**
 - Make sure Python is installed
 - pip install kivy
 - install supabase to utilize client Library : pip install supabase
 - pip install python-dotenv
+
 - Currently, there is no executable code as we still need to develop the separate parts of the program before we can combine.
 
 ## Road Map
