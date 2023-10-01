@@ -4,7 +4,7 @@ main.py
 This is the main application where we actually use all the code to create the application.
 Right now, it isn't super complicated as we are on Sprint #2, which doesn't implement the full thing yet.
 
-by Alex Prosser
+by Alex Prosser, Jackson Morawski
 9/28/2023
 """
 
@@ -18,6 +18,8 @@ from src import common
 from src.database import Supabase
 from src.screens.player_entry_screen import PlayerEntryScreen
 from src.screens.splash_screen import SplashScreen
+from src.screens.player_table_screen import PlayerTableScreen
+from src.screens.insert_player_screen import InsertPlayerScreen
 
 # hide window so it doesn't look as weird
 Window.hide()
@@ -39,9 +41,15 @@ class LaserTagSystem(App):
         self.splash_screen.set_system(self)
         self.player_entry_screen = PlayerEntryScreen(name=common.PLAYER_ENTRY_SCREEN)
         self.player_entry_screen.set_system(self)
+        self.player_table_screen = PlayerTableScreen(name=common.PLAYER_TABLE_SCREEN)
+        self.player_table_screen.set_system(self)
+        self.insert_player_screen = InsertPlayerScreen(name=common.INSERT_PLAYER_SCREEN)
+        self.insert_player_screen.set_system(self)
         
         self.screen_manager.add_widget(self.splash_screen)
         self.screen_manager.add_widget(self.player_entry_screen)
+        self.screen_manager.add_widget(self.player_table_screen)
+        self.screen_manager.add_widget(self.insert_player_screen)
 
     def on_start(self):
         """

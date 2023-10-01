@@ -11,6 +11,8 @@ from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.button import Button
+from .. import common
+
 
 class PlayerEntryScreen(Screen):
     """
@@ -27,7 +29,11 @@ class PlayerEntryScreen(Screen):
     
         root.add_widget(Label(text='Player Entry Screen', font_size=24))
         data_button = Button(text='Get Data', font_size=24)
-        data_button.bind(on_press=self.get_data)
+        data_button.bind(on_press=self.switch_to_player_table)
+        root.add_widget(data_button)
+
+        data_button = Button(text='Insert Player', font_size=24)
+        data_button.bind(on_press=self.switch_to_insert_player)
         root.add_widget(data_button)
     
         self.add_widget(root)
@@ -38,5 +44,17 @@ class PlayerEntryScreen(Screen):
         """
         self.laser_tag_system = system
 
-    def get_data(self, instance):
-        self.laser_tag_system.supabase.get_all_players()
+    # def get_data(self, instance):
+    #     self.data = self.laser_tag_system.supabase.get_all_players()
+
+    def switch_to_player_table(self, delta_time):
+        """
+        The callback for the on_enter method which switches the screen to the player entry screen
+        """
+        self.laser_tag_system.switch_screen(common.PLAYER_TABLE_SCREEN)
+
+    def switch_to_insert_player(self, delta_time):
+        """
+        The callback for the on_enter method which switches the screen to the player entry screen
+        """
+        self.laser_tag_system.switch_screen(common.INSERT_PLAYER_SCREEN)
