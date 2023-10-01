@@ -8,6 +8,7 @@ The main project repository for CSCE 3513 - Software Engineering. This contains 
 ## How to use
 
 Make sure Python 3.9+ is installed.
+Download pinned creds.env file from slack and set path within database.py line 16
 It is highly recommended to use a Python virtual environment. To create one, use:
 
 `python -m venv /path/to/virtual/environment`
