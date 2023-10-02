@@ -12,6 +12,8 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from .. import common
+from ..database import Supabase
+from kivy.uix.textinput import TextInput
 
 class InsertPlayerScreen(Screen):
     """
@@ -26,6 +28,24 @@ class InsertPlayerScreen(Screen):
         # create the root UI and add text for now
         root = BoxLayout(orientation='vertical')
     
+        instance = Supabase
+
+        root.orientation = 'vertical'
+
+        self.id_input = TextInput(hint_text='Enter ID')
+        self.first_name_input = TextInput(hint_text='Enter First Name')
+        self.last_name_input = TextInput(hint_text='Enter Last Name')
+        self.codename_input = TextInput(hint_text='Enter Codename')
+
+        self.submit_button = Button(text='Submit')
+        self.submit_button.bind(on_release=self.submit_data) 
+
+        root.add_widget(self.id_input)
+        root.add_widget(self.first_name_input)
+        root.add_widget(self.last_name_input)
+        root.add_widget(self.codename_input)
+        root.add_widget(self.submit_button)
+
         root.add_widget(Label(text='Insert Player Screen', font_size=24))
         data_button = Button(text='Go Back', font_size=24)
         data_button.bind(on_press=self.switch_to_player_entry)
@@ -45,5 +65,5 @@ class InsertPlayerScreen(Screen):
         """
         self.laser_tag_system.switch_screen(common.PLAYER_ENTRY_SCREEN)
 
-    def get_data(self, instance):
-        self.data = self.laser_tag_system.supabase.get_all_players()
+    def submit_data(self, instance):
+        Supabase.submit_data(self)

@@ -14,6 +14,9 @@ from kivy.uix.button import Button
 from supabase import create_client
 from .. import common
 
+# Import the Supabase class from database.py
+from ..database import Supabase
+
 class PlayerTableScreen(Screen):
     """
     The player table screen for the Photon Laser Tag System App.\n
@@ -26,14 +29,16 @@ class PlayerTableScreen(Screen):
 
         # create the root UI and add text for now
         root = BoxLayout(orientation='vertical')
-    
-        root.add_widget(Label(text='Player Table Screen', font_size=24))
+
+        players = Supabase().get_all_players()  # Call the get_all_players function, make table
+        for player in players:
+            player_info = f"id: {player['id']}, first_name: {player['first_name']}, last_name: {player['last_name']}, codename: {player['codename']}"
+            root.add_widget(Label(text=player_info))
+
+        root.add_widget(Label(text='Player Table Screen', font_size=24)) # other widgets with label and back button
         data_button = Button(text='Go Back', font_size=24)
         data_button.bind(on_press=self.switch_to_player_entry)
-        root.add_widget(data_button)
-
-        #add the widget with the table
-
+        root.add_widget(data_button)       
     
         self.add_widget(root)
 
@@ -48,6 +53,3 @@ class PlayerTableScreen(Screen):
         The callback for the on_enter method which switches the screen to the player entry screen
         """
         self.laser_tag_system.switch_screen(common.PLAYER_ENTRY_SCREEN)
-
-    def get_data(self):
-        self.data = self.laser_tag_system.Supabase.get_all_players()
