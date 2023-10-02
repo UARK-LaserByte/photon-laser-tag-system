@@ -19,7 +19,9 @@ Here are the libraries used:
 - `pip install supabase`
 - `pip install python-dotenv`
 
-Then, run the program using `python main.py`
+Then, download and put `.env` from the Slack into the root folder.
+
+Finally, run the program using `python main.py`
 
 ## Road Map
 
