@@ -3,12 +3,11 @@
 The main project repository for CSCE 3513 - Software Engineering. This contains all the source code and (maybe) an executable for all distributions of the software. Right now, it is still being developed, but a road map of features will be included to show where we are at.
 
 #### by LaserByte - Team 8
-##### Last updated 9/28/2023
+##### Last updated 10/1/2023
 
 ## How to use
 
 Make sure Python 3.9+ is installed.
-Download pinned creds.env file from slack and set path within database.py line 16
 It is highly recommended to use a Python virtual environment. To create one, use:
 
 `python -m venv /path/to/virtual/environment`

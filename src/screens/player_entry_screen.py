@@ -3,18 +3,99 @@ src/screens/player_entry_screen.py
 
 See description below.
 
-by Alex Prosser, Eric Lee
-9/30/2023
+by Eric Lee, Alex Prosser
+10/1/2023
 """
 
 from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
-from kivy.uix.button import Button
-from kivy.app import App
 from kivy.uix.textinput import TextInput
-from .. import common
+from kivy.uix.popup import Popup
+from kivy.uix.button import Button
 
+class PlayerEntryColumn(BoxLayout):
+    def __init__(self, team_name):
+        super().__init__()
+        self.laser_tag_system = None
+
+        self.orientation = 'vertical'
+        self.team_name = team_name
+        self.rows = []
+        self.create = False
+        
+        equipment_id_content = BoxLayout(orientation='vertical')
+        
+        self.equipment_id_input = TextInput(hint_text='Equipment ID...', multiline=False, input_filter='int', on_text_validate=self.send_equipment_id)
+        equipment_id_button = Button(text='Submit', size_hint_y = None, height = 40)
+        equipment_id_button.bind(on_release=self.send_equipment_id)
+
+        equipment_id_content.add_widget(Label(text='What equipment ID?:'))
+        equipment_id_content.add_widget(self.equipment_id_input)
+        equipment_id_content.add_widget(equipment_id_button)
+        self.equipment_id_popup = Popup(title='Set Equipment ID', content=equipment_id_content, size_hint=(0.5, 0.3))
+
+        self.add_widget(Label(text=f'{self.team_name} Team'))
+
+        for _ in range(10):
+            row = BoxLayout(orientation='horizontal')
+            player_id_input = TextInput(hint_text='Player ID...', multiline=False, size_hint=(0.3, None), height=40, input_filter='int', on_text_validate=self.try_autocomplete)
+            code_name_input = TextInput(hint_text='Code Name...', multiline=False, size_hint=(0.4, None), height=40, on_text_validate=self.handle_submit)
+            edit_button = Button(text='Edit', size_hint=(0.3, None), height=40)
+            edit_button.bind(on_release=self.handle_submit)
+
+            row.add_widget(player_id_input)
+            row.add_widget(code_name_input)
+            row.add_widget(edit_button)
+
+            self.rows.append((player_id_input, code_name_input))
+            self.add_widget(row)
+
+    def clear_table(self):
+        for player_id_input, code_name_input in self.rows:
+            player_id_input.text = ''
+            code_name_input.text = ''
+            code_name_input.hint_text = 'Code Name...'
+
+    def try_autocomplete(self, instance):
+        current_code_name_input = instance.parent.children[1] # get the other TextInput
+        current_code_name_input.hint_text = 'Searching...'
+
+        player = self.laser_tag_system.supabase.get_player_by_id(id=int(instance.text))
+        if player != None:
+            current_code_name_input.text = player['codename']
+            self.create = False
+        else:
+            current_code_name_input.hint_text = 'None found! Please enter new name...'
+            self.create = True
+
+    def handle_submit(self, instance):
+        if self.create:
+            self.create_player(instance)
+        else:
+            self.submit_player(instance)
+
+    def create_player(self, instance):
+        current_code_name_input = instance.parent.children[1]
+        current_player_id_input = instance.parent.children[2]
+        self.laser_tag_system.supabase.create_player(id=int(current_player_id_input.text), codename=current_code_name_input.text)
+        self.equipment_id_popup.open()
+
+    def submit_player(self, instance):
+        current_code_name_input = instance.parent.children[1]
+        current_player_id_input = instance.parent.children[2]
+        self.laser_tag_system.supabase.update_player(id=int(current_player_id_input.text), codename=current_code_name_input.text)
+        self.equipment_id_popup.open()
+
+    def send_equipment_id(self, instance):
+        self.laser_tag_system.udp.broadcast(int(self.equipment_id_input.text))
+        self.equipment_id_popup.dismiss()
+
+    def set_system(self, system):
+        """
+        Sets the main system to make global calls to the other parts of the code
+        """
+        self.laser_tag_system = system
 
 class PlayerEntryScreen(Screen):
     """
@@ -26,107 +107,35 @@ class PlayerEntryScreen(Screen):
         super().__init__(**kwargs)
         self.laser_tag_system = None
 
-        # create the root UI and add text for now
         root = BoxLayout(orientation='vertical')
-    
-        root.add_widget(Label(text='Main Menu - Player Entry Screen', font_size=24))
-        data_button = Button(text='Get Data', font_size=24)
-        data_button.bind(on_press=self.switch_to_player_table)
-        root.add_widget(data_button)
+        table = BoxLayout(orientation='horizontal')
 
-        data_button = Button(text='Insert Player', font_size=24)
-        data_button.bind(on_press=self.switch_to_insert_player)
-        root.add_widget(data_button)
-    
+        self.red_team = PlayerEntryColumn(team_name='Red')
+        red_team_layout = BoxLayout(orientation='horizontal', spacing=100)
+        red_team_layout.add_widget(self.red_team)
+
+        self.green_team = PlayerEntryColumn(team_name='Green')
+        green_team_layout = BoxLayout(orientation='horizontal', spacing=100)
+        green_team_layout.add_widget(self.green_team)
+
+        table.add_widget(red_team_layout)
+        table.add_widget(green_team_layout)
+        root.add_widget(table)
+
+        clear_button = Button(text='Clear Names', size_hint=(None, None))
+        clear_button.bind(on_release=self.clear_names)
+        root.add_widget(clear_button)
+
         self.add_widget(root)
-
-        ##Eric Lee
-        # self.orientation = 'vertical'
-        # self.team_name = 'team_name'
-        # self.rows = []
-
-        # self.create_header()
-        # self.create_header_labels()
-        # self.create_rows()
-        # self.create_clear_button()
-
-    ##Eric Lee
-    # def create_header(self):
-    #     header_layout = BoxLayout(orientation='horizontal', spacing=10, size_hint_y=None, height=40)
-    #     header_label = Label(text=f'{self.team_name} Team', size_hint=(None, 1), width=700)
-    #     header_layout.add_widget(header_label)
-    #     self.add_widget(header_layout)
-
-    # def create_header_labels(self):
-    #     self.header_layout = BoxLayout(orientation='horizontal')
-    #     self.header_layout.add_widget(Label(text='Name'))
-    #     self.header_layout.add_widget(Label(text='Score'))
-    #     self.add_widget(self.header_layout)
-
-    # def create_rows(self):
-    #     for _ in range(10):
-    #         row_layout = BoxLayout(orientation='horizontal')
-    #         name_input = TextInput(hint_text='', multiline=False)
-    #         score_input = TextInput(hint_text='', multiline=False, disabled=True)
-
-    #         row_layout.add_widget(name_input)
-    #         row_layout.add_widget(score_input)
-
-    #         self.rows.append((name_input, score_input))
-    #         self.add_widget(row_layout)
-
-    # def create_clear_button(self):
-    #     clear_button = Button(text='Clear Names', size_hint=(None, None), size=(400, 80))
-    #     clear_button.bind(on_release=self.clear_names)
-    #     self.add_widget(clear_button)
-
-    # def clear_names(self, instance):
-    #     for name_input, _ in self.rows:
-    #         name_input.text = ''
-
-    # def update_table(self):
-    #     # Print or process the data for the team here
-    #     print(f'{self.team_name} Team:')
-    #     for i, (name_input, score_input) in enumerate(self.rows, 1):
-    #         name = name_input.text
-    #         score = score_input.text
-    #         print(f'Player {i}: Name={name}, Score={score}')
-    # ##
 
     def set_system(self, system):
         """
         Sets the main system to make global calls to the other parts of the code
         """
         self.laser_tag_system = system
+        self.red_team.set_system(system)
+        self.green_team.set_system(system)
 
-    # def get_data(self, instance):
-    #     self.data = self.laser_tag_system.supabase.get_all_players()
-
-    def switch_to_player_table(self, delta_time):
-        """
-        The callback for the on_enter method which switches the screen to the player entry screen
-        """
-        self.laser_tag_system.switch_screen(common.PLAYER_TABLE_SCREEN)
-
-    def switch_to_insert_player(self, delta_time):
-        """
-        The callback for the on_enter method which switches the screen to the player entry screen
-        """
-        self.laser_tag_system.switch_screen(common.INSERT_PLAYER_SCREEN)
-    def get_data(self, instance):
-        self.laser_tag_system.supabase.get_all_players()
-    
-    ##Eric Lee
-    # class TeamScoreScreen(App):
-    #     def build(self):
-    #         self.red_team_table = PlayerEntryScreen(team_name='Red')
-    #         self.green_team_table = PlayerEntryScreen(team_name='Green')
-
-    #         main_layout = BoxLayout(orientation='horizontal')
-    #         main_layout.add_widget(self.red_team_table)
-    #         main_layout.add_widget(self.green_team_table)
-
-    #         return main_layout
-    ##
-    # if __name__ == '__main__':
-    #     TeamScoreScreen().run()
+    def clear_names(self, instance):
+        self.red_team.clear_table()
+        self.green_team.clear_table()

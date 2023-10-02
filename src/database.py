@@ -4,7 +4,7 @@ src/database.py
 See description below.
 
 by Alex Prosser, Jackson Morawski
-9/28/2023
+10/1/2023
 """
 
 from supabase import create_client
@@ -13,7 +13,7 @@ import os
 from . import common
 
 # load supabase keys (not displayed on github for security reasons)
-load_dotenv(r) # r"PATH TO ENV"
+load_dotenv()
 
 class Supabase():
     """
@@ -24,21 +24,18 @@ class Supabase():
         self.client = create_client(os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_KEY'))
 
     def get_all_players(self) -> list[dict]:
-        response = self.client.from_('player').select('*').execute()
+        response = self.client.table(common.PLAYER_TABLE).select('*').execute()
         return response.data
     
-    def submit_data(data):
-        id = data.id_input.text
-        first_name = data.first_name_input.text
-        last_name = data.last_name_input.text
-        codename = data.codename_input.text
+    def get_player_by_id(self, id: int) -> dict | None:
+        response = self.client.table(common.PLAYER_TABLE).select('*').eq('id', id).execute()
+        if len(response.data) != 0:
+            return response.data[0]
+        
+        return None
+    
+    def update_player(self, id: int, codename: str):
+        self.client.table(common.PLAYER_TABLE).update({'codename': codename}).eq('id', id).execute()
 
-        # Insert data into the 'player' table
-        data_to_insert = [{'id': id, 'first_name': first_name, 'last_name': last_name, 'codename': codename}]
-        error = create_client(os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_KEY')).table('player').upsert(data_to_insert).execute()
-        if error:
-            print('Error:', error)
-        else:
-            print('Data inserted/updated successfully!')
-
-
+    def create_player(self, id: int, codename: str):
+        self.client.table(common.PLAYER_TABLE).insert({'id': id, 'codename': codename}).execute()

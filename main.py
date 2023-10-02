@@ -5,7 +5,7 @@ This is the main application where we actually use all the code to create the ap
 Right now, it isn't super complicated as we are on Sprint #2, which doesn't implement the full thing yet.
 
 by Alex Prosser, Jackson Morawski
-9/28/2023
+10/1/2023
 """
 
 # kivy imports
@@ -16,10 +16,9 @@ from kivy.uix.screenmanager import ScreenManager
 # own imports
 from src import common
 from src.database import Supabase
+from src.udp import UDP
 from src.screens.player_entry_screen import PlayerEntryScreen
 from src.screens.splash_screen import SplashScreen
-from src.screens.player_table_screen import PlayerTableScreen
-from src.screens.insert_player_screen import InsertPlayerScreen
 
 # hide window so it doesn't look as weird
 Window.hide()
@@ -36,20 +35,15 @@ class LaserTagSystem(App):
         # create main screen manager and add all current screens to it
         self.screen_manager = ScreenManager()
         self.supabase = Supabase()
+        self.udp = UDP()
 
         self.splash_screen = SplashScreen(name=common.SPLASH_SCREEN)
         self.splash_screen.set_system(self)
         self.player_entry_screen = PlayerEntryScreen(name=common.PLAYER_ENTRY_SCREEN)
         self.player_entry_screen.set_system(self)
-        self.player_table_screen = PlayerTableScreen(name=common.PLAYER_TABLE_SCREEN)
-        self.player_table_screen.set_system(self)
-        self.insert_player_screen = InsertPlayerScreen(name=common.INSERT_PLAYER_SCREEN)
-        self.insert_player_screen.set_system(self)
         
         self.screen_manager.add_widget(self.splash_screen)
         self.screen_manager.add_widget(self.player_entry_screen)
-        self.screen_manager.add_widget(self.player_table_screen)
-        self.screen_manager.add_widget(self.insert_player_screen)
 
     def on_start(self):
         """
