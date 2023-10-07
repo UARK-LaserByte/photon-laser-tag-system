@@ -2,16 +2,20 @@
 main.py
 
 This is the main application where we actually use all the code to create the application.
-Right now, it isn't super complicated as we are on Sprint #2, which doesn't implement the full thing yet.
+Right now, it isn't super complicated as we are on Sprint #3, which doesn't implement the full thing yet.
 
 by Alex Prosser, Jackson Morawski
-10/1/2023
+10/7/2023
 """
 
 # kivy imports
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.uix.screenmanager import ScreenManager
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
+from kivy.uix.popup import Popup
+from kivy.uix.button import Button
 
 # own imports
 from src import common
@@ -19,6 +23,8 @@ from src.database import Supabase
 from src.udp import UDP
 from src.screens.player_entry_screen import PlayerEntryScreen
 from src.screens.splash_screen import SplashScreen
+from src.screens.countdown_screen import CountdownScreen
+from src.screens.player_action_screen import PlayerActionScreen
 
 # hide window so it doesn't look as weird
 Window.hide()
@@ -32,18 +38,40 @@ class LaserTagSystem(App):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        # create main screen manager and add all current screens to it
-        self.screen_manager = ScreenManager()
+        # other systems
         self.supabase = Supabase()
         self.udp = UDP()
+
+        # state management system
+        self.players: dict[str, list[common.Player]] = { common.RED_TEAM: [], common.GREEN_TEAM: [] }
+
+        # create main screen manager and add all current screens to it
+        self.screen_manager = ScreenManager()
 
         self.splash_screen = SplashScreen(name=common.SPLASH_SCREEN)
         self.splash_screen.set_system(self)
         self.player_entry_screen = PlayerEntryScreen(name=common.PLAYER_ENTRY_SCREEN)
         self.player_entry_screen.set_system(self)
+        self.countdown_screen = CountdownScreen(name=common.COUNTDOWN_SCREEN)
+        self.countdown_screen.set_system(self)
+        self.player_action_screen = PlayerActionScreen(name=common.PLAYER_ACTION_SCREEN)
+        self.player_action_screen.set_system(self)
         
         self.screen_manager.add_widget(self.splash_screen)
         self.screen_manager.add_widget(self.player_entry_screen)
+        self.screen_manager.add_widget(self.countdown_screen)
+        self.screen_manager.add_widget(self.player_action_screen)
+
+        # create error popup
+        error_content = BoxLayout(orientation='vertical')
+        
+        error_button = Button(text='Dismiss', size_hint_y=None, height=40)
+        error_button.bind(on_release=self.dismiss_error)
+
+        self.error_message_label = Label(text='No error...')
+        error_content.add_widget(self.error_message_label)
+        error_content.add_widget(error_button)
+        self.error_popup = Popup(title='Error', content=error_content, size_hint=(0.5, 0.4))
 
     def on_start(self):
         """
@@ -75,11 +103,24 @@ class LaserTagSystem(App):
         """
         self.keyboard_manager = None
 
-    def switch_screen(self, screen_name):
+    def switch_screen(self, screen_name: str):
         """
         Switches the screen using the screen id. 
         """
         self.screen_manager.current = screen_name
+
+    def dismiss_error(self, instance):
+        """
+        Callback to the error popup which closes it
+        """
+        self.error_popup.dismiss()
+
+    def show_error(self, message):
+        """
+        Updates popup with new error message and shows it
+        """
+        self.error_message_label.text = message
+        self.error_popup.open()
 
 # create laser tag system in the global scope so all screens has access to it
 laser_tag_system = LaserTagSystem()

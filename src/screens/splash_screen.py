@@ -4,27 +4,32 @@ src/screens/splash_screen.py
 See description below.
 
 by Cindy Nguyen, Alex Prosser
-10/1/2023
+10/7/2023
 """
 
 from kivy.clock import Clock
 from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.image import Image
+from kivy.animation import Animation
 from .. import common
 
 class SplashScreen(Screen):
     """
-    The splash screen shows the photon logo for 3 seconds, then moves the the player entry screen.\n
-    This is built of of Kivy's built-in Screen system.
+    The splash screen shows the photon logo for 3 seconds, then moves to the player entry screen.\n
+    This is built off of Kivy's built-in Screen system.
     """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.laser_tag_system = None
 
-        # create the root UI and add text for now
+        # create the root UI and add image
         root = BoxLayout(orientation='vertical')
-        root.add_widget(Image(source='resources/logo.jpg'))
+        image = Image(source='resources/logo.jpg')
+        fade_animation = Animation(opacity=0, duration=5)
+        fade_animation.start(image)
+
+        root.add_widget(image)
         self.add_widget(root)
 
     def set_system(self, system):

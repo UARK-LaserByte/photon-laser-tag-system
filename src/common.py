@@ -4,12 +4,21 @@ src/common.py
 This is just common variables and code that will be accessed by all the files
 
 by Alex Prosser, Jackson Morawski
-10/1/2023
+10/7/2023
 """
+
+# Custom types
+Player = tuple[int, int, str]
+
+# Team Names
+RED_TEAM = 'Red'
+GREEN_TEAM = 'Green'
 
 # Screen ID constants
 SPLASH_SCREEN = 'splash_screen'
 PLAYER_ENTRY_SCREEN = 'player_entry_screen'
+COUNTDOWN_SCREEN = 'countdown_screen'
+PLAYER_ACTION_SCREEN = 'player_action_screen'
 
 # Window constants
 WINDOW_WIDTH = 960
@@ -19,13 +28,13 @@ WINDOW_TITLE = 'Photon Laser Tag System'
 # Database constants
 PLAYER_TABLE = 'players'
 
-# UDP constants
+# UDP Code constants
 UDP_GAME_START = 202
 UDP_GAME_END = 221
 UDP_RED_BASE_SCORED = 66
 UDP_GREEN_BASE_SCORED = 148
 
-# Other constants
+# Other UDP constants
 PORT_SOCKET_BROADCAST = 7500
 PORT_SOCKET_RECEIVE = 7501
 URL_LOCALHOST = '127.0.0.1'
