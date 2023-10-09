@@ -3,7 +3,7 @@
 The main project repository for CSCE 3513 - Software Engineering. This contains all the source code and (maybe) an executable for all distributions of the software. Right now, it is still being developed, but a road map of features will be included to show where we are at.
 
 #### by LaserByte - Team 8
-##### Last updated 10/1/2023
+##### Last updated 10/9/2023
 
 ## How to use
 
@@ -35,6 +35,13 @@ Finally, run the program using `python main.py`
 - Creating the splash screen and player entry screen
 - Setting up UDP sockets and testing a full game without UI
 - Updating the design document to full define the expectations of the project
+
+**Sprint #3**:
+- Finishing the screen flow and fixing any bugs with player entry screen
+- Creating the countdown screen and player action screen
+- Finishing UDP interactions
+- Finishing the design document
+- Standardizing the UI for the entire application
 
 ## Design Document
 
