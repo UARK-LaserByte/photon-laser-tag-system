@@ -4,7 +4,7 @@ src/screens/player_entry_screen.py
 See description below.
 
 by Eric Lee, Alex Prosser
-10/7/2023
+10/9/2023
 """
 
 from kivy.uix.screenmanager import Screen
@@ -13,16 +13,22 @@ from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
 from kivy.uix.popup import Popup
 from kivy.uix.button import Button
+from kivy.uix.widget import Widget
 from .. import common
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from main import LaserTagSystem
 
 class PlayerEntryColumn(BoxLayout):
     """
-    A column for part of the PlayerEntryScreen. Takes all the input and stores it in the global state to be used
-    by other parts of the application. 
+    A column for part of the PlayerEntryScreen.
+
+    Takes all the input and stores it in the global state to be used by other parts of the application. 
     """
     def __init__(self, team_name: str):
         super().__init__()
-        self.laser_tag_system = None
+        self.laser_tag_system: LaserTagSystem = None
 
         self.team_name = team_name
         self.rows: list[tuple[TextInput, TextInput]] = []
@@ -76,11 +82,14 @@ class PlayerEntryColumn(BoxLayout):
             code_name_input.text = ''
             code_name_input.hint_text = 'Code Name...'
 
-    def try_autocomplete(self, instance):
+    def try_autocomplete(self, instance: Widget):
         """
         Asks the database if the user exists
+
         If a player ID exists, autocomplete the code name
+
         If not, ask the user to enter a new code name and create a player
+
         Also moves the current focus to the code name input
         """
         current_code_name_input: TextInput = self.rows[instance.row][1]
@@ -95,7 +104,7 @@ class PlayerEntryColumn(BoxLayout):
 
         current_code_name_input.focus = True
 
-    def handle_submit(self, instance):
+    def handle_submit(self, instance: Widget):
         """
         Creates or updates a player and prompts user to enter a equipment id
         """
@@ -127,9 +136,10 @@ class PlayerEntryColumn(BoxLayout):
             self.equipment_id_input.text = str(self.equipment_ids[self.current_player])
             self.equipment_id_popup.open()
 
-    def send_equipment_id(self, instance):
+    def send_equipment_id(self, instance: Widget):
         """
         Sends a UDP request saying that a player has been added
+
         Also updates global state to create a player
         """
         equipment_id = int(self.equipment_id_input.text)
@@ -144,7 +154,11 @@ class PlayerEntryColumn(BoxLayout):
     def get_all_players_from_rows(self) -> list[common.Player]:
         """
         Gets all the player info from the rows and converts it into useable data
+
         Will be used to save player info between screens
+
+        Returns:
+            list of players from the inputs
         """
         players = []
         for i in range(len(self.rows)):
@@ -156,18 +170,21 @@ class PlayerEntryColumn(BoxLayout):
     def set_system(self, system):
         """
         Sets the main system to make global calls to the other parts of the code
+
+        Args:
+            system: the main LaserTagSystem from main.py
         """
         self.laser_tag_system = system
 
 class PlayerEntryScreen(Screen):
     """
-    The player entry screen for the Photon Laser Tag System App.\n
-    This allows for the team's players to be entered into the system.\n
-    INCOMPLETE
+    The player entry screen for the Photon Laser Tag System App.
+
+    This allows for the team's players to be entered into the system.
     """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.laser_tag_system = None
+        self.laser_tag_system: LaserTagSystem = None
 
         root = BoxLayout(orientation='vertical')
 
@@ -208,22 +225,26 @@ class PlayerEntryScreen(Screen):
     def set_system(self, system):
         """
         Sets the main system to make global calls to the other parts of the code
+
+        Args:
+            system: the main LaserTagSystem from main.py
         """
         self.laser_tag_system = system
         self.red_team.set_system(system)
         self.green_team.set_system(system)
 
-    def clear_names(self, instance):
+    def clear_names(self, instance: Widget):
         """
         Calls both tables clear methods
         """
         self.red_team.clear_table()
         self.green_team.clear_table()
 
-    def start_game(self, instance):
+    def start_game(self, instance: Widget):
         """
         Gets all the players from both teams and sends them to global data
-        Also checks for duplicates and throws error
+
+        Also checks for duplicates in player and equipment IDs and throws error if found 
         """
         red_players = self.red_team.get_all_players_from_rows()
         green_players = self.green_team.get_all_players_from_rows()
