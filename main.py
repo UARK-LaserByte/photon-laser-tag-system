@@ -5,7 +5,7 @@ This is the main application where we actually use all the code to create the ap
 Right now, it isn't super complicated as we are on Sprint #3, which doesn't implement the full thing yet.
 
 by Alex Prosser, Jackson Morawski
-10/9/2023
+10/10/2023
 """
 
 # kivy imports
@@ -43,7 +43,7 @@ class LaserTagSystem(App):
 
         # other systems
         self.supabase = Supabase()
-        self.udp = UDP(self)
+        self.udp = UDP()
 
         # state management system
         self.players: dict[str, list[common.Player]] = { common.RED_TEAM: [], common.GREEN_TEAM: [] }

@@ -3,7 +3,7 @@
 The main project repository for CSCE 3513 - Software Engineering. This contains all the source code and (maybe) an executable for all distributions of the software. Right now, it is still being developed, but a road map of features will be included to show where we are at.
 
 #### by LaserByte - Team 8
-##### Last updated 10/9/2023
+##### Last updated 10/10/2023
 
 ## How to use
 
