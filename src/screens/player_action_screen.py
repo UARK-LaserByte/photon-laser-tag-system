@@ -3,8 +3,8 @@ src/screens/player_action_screen.py
 
 See description below.
 
-by Alex Prosser, Eric lee
-10/20/2023
+by Eric Lee, Alex Prosser
+10/22/2023
 """
 
 import time
