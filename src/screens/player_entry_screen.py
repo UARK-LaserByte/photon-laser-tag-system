@@ -4,9 +4,10 @@ src/screens/player_entry_screen.py
 See description below.
 
 by Eric Lee, Alex Prosser
-10/9/2023
+10/22/2023
 """
 
+from typing import TYPE_CHECKING
 from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
@@ -14,8 +15,8 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.popup import Popup
 from kivy.uix.button import Button
 from kivy.uix.widget import Widget
+from ..models.player import Player
 from .. import common
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from main import LaserTagSystem
@@ -116,7 +117,7 @@ class PlayerEntryColumn(BoxLayout):
         players = self.get_all_players_from_rows()
         error = False
         for i in range(len(players)):
-            if (players[i][0] == int(current_player_id_input.text)) and i != self.current_player:
+            if (players[i].player_id == int(current_player_id_input.text)) and i != self.current_player:
                 current_code_name_input.text = ''
                 current_code_name_input.hint_text = 'Code Name...'
                 current_player_id_input.text = ''
@@ -151,7 +152,7 @@ class PlayerEntryColumn(BoxLayout):
             self.laser_tag_system.udp.broadcast(equipment_id)
             self.equipment_id_popup.dismiss()
 
-    def get_all_players_from_rows(self) -> list[common.Player]:
+    def get_all_players_from_rows(self) -> list[Player]:
         """
         Gets all the player info from the rows and converts it into useable data
 
@@ -164,9 +165,9 @@ class PlayerEntryColumn(BoxLayout):
         for i in range(len(self.rows)):
             player_id_input, code_name_input = self.rows[i]
             if player_id_input.text != '' and code_name_input.text != '':
-                players.append((int(player_id_input.text), self.equipment_ids[i], code_name_input.text))
+                players.append(Player(player_id=int(player_id_input.text), equipment_id=self.equipment_ids[i], codename=code_name_input.text, team=self.team_name))
         return players
-
+    
     def set_system(self, system):
         """
         Sets the main system to make global calls to the other parts of the code
@@ -174,6 +175,7 @@ class PlayerEntryColumn(BoxLayout):
         Args:
             system: the main LaserTagSystem from main.py
         """
+
         self.laser_tag_system = system
 
 class PlayerEntryScreen(Screen):
@@ -222,17 +224,6 @@ class PlayerEntryScreen(Screen):
 
         self.add_widget(root)
 
-    def set_system(self, system):
-        """
-        Sets the main system to make global calls to the other parts of the code
-
-        Args:
-            system: the main LaserTagSystem from main.py
-        """
-        self.laser_tag_system = system
-        self.red_team.set_system(system)
-        self.green_team.set_system(system)
-
     def clear_names(self, instance: Widget):
         """
         Calls both tables clear methods
@@ -253,10 +244,10 @@ class PlayerEntryScreen(Screen):
         error = False
         for red_player in red_players:
             for green_player in green_players:
-                if red_player[0] == green_player[0]:
+                if red_player.player_id == green_player.player_id:
                     self.laser_tag_system.show_error('There are duplicate players between the teams! FIX IT')
                     error = True
-                if red_player[1] == green_player[1]:
+                if red_player.equipment_id == green_player.equipment_id:
                     self.laser_tag_system.show_error('There are duplicate equipment IDs between the teams! FIX IT')
                     error = True
 
@@ -265,4 +256,16 @@ class PlayerEntryScreen(Screen):
             self.laser_tag_system.players[common.GREEN_TEAM] = green_players
 
             self.laser_tag_system.switch_screen(common.COUNTDOWN_SCREEN)
+    
+    def set_system(self, system):
+        """
+        Sets the main system to make global calls to the other parts of the code
+
+        Args:
+            system: the main LaserTagSystem from main.py
+        """
+
+        self.laser_tag_system = system
+        self.red_team.set_system(system=system)
+        self.green_team.set_system(system=system)
         

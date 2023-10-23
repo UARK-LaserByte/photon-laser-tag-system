@@ -4,11 +4,8 @@ src/common.py
 This is just common variables and code that will be accessed by all the files
 
 by Alex Prosser, Jackson Morawski
-10/7/2023
+10/22/2023
 """
-
-# Custom types
-Player = tuple[int, int, str]
 
 # Team Names
 RED_TEAM = 'Red'
@@ -32,7 +29,7 @@ PLAYER_TABLE = 'players'
 UDP_GAME_START = 202
 UDP_GAME_END = 221
 UDP_RED_BASE_SCORED = 66
-UDP_GREEN_BASE_SCORED = 148
+UDP_GREEN_BASE_SCORED = 43
 
 # Other UDP constants
 PORT_SOCKET_BROADCAST = 7500
