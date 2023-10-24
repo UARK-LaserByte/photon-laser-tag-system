@@ -17,6 +17,7 @@ from kivy.uix.button import Button
 from kivy.uix.widget import Widget
 from ..models.player import Player
 from .. import common
+from kivy.core.window import Window
 
 if TYPE_CHECKING:
     from main import LaserTagSystem
@@ -193,7 +194,10 @@ class PlayerEntryScreen(Screen):
     This allows for the team's players to be entered into the system.
     """
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        super(PlayerEntryScreen, self).__init__(**kwargs)
+        self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
+        self._keyboard.bind(on_key_down=self._on_keyboard_down)
+
         self.laser_tag_system: LaserTagSystem = None
 
         root = BoxLayout(orientation='vertical')
@@ -277,3 +281,29 @@ class PlayerEntryScreen(Screen):
         self.laser_tag_system = system
         self.red_team.set_system(system=system)
         self.green_team.set_system(system=system)
+
+    def _keyboard_closed(self):
+        print('keyboard closed!')
+        # self._keyboard.unbind(on_key_down=self._on_keyboard_down) ##fricked up here
+        # self._keyboard = None
+
+    def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
+        # print('The key', keycode, 'have been pressed')
+        # print(' - text is %r' % text)
+        # print(' - modifiers are %r' % modifiers)
+
+        # Keycode is composed of an integer + a string
+        # If we hit escape, release the keyboard
+        if keycode[1] == 'escape':
+            self._keyboard.unbind(on_key_down=self._on_keyboard_down) ##fricked up here
+            self._keyboard = None
+            keyboard.release()
+        if keycode[1] == 'f5':
+            print('we in')
+            self.start_game(None)
+        if keycode[1] == 'f12':
+            self.clear_names(None)
+
+        # Return True to accept the key. Otherwise, it will be used by
+        # the system.
+        return True
