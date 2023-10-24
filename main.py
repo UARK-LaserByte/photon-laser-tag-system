@@ -43,7 +43,7 @@ class LaserTagSystem(App):
 
         # other systems
         self.supabase = Supabase()
-        self.udp = UDP(self)
+        self.udp = UDP()
 
         # state management system
         self.players: dict[str, list[common.Player]] = { common.RED_TEAM: [], common.GREEN_TEAM: [] }
