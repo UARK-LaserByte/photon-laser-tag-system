@@ -4,9 +4,10 @@ src/screens/player_entry_screen.py
 See description below.
 
 by Eric Lee, Alex Prosser
-10/9/2023
+10/22/2023
 """
 
+from typing import TYPE_CHECKING
 from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
@@ -14,8 +15,9 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.popup import Popup
 from kivy.uix.button import Button
 from kivy.uix.widget import Widget
+from ..models.player import Player
 from .. import common
-from typing import TYPE_CHECKING
+from kivy.core.window import Window
 
 if TYPE_CHECKING:
     from main import LaserTagSystem
@@ -39,16 +41,24 @@ class PlayerEntryColumn(BoxLayout):
 
         # setup root ui
         self.orientation = 'vertical'
-        self.add_widget(Label(text=f'{self.team_name} Team'))
+        self.label = Label(text=f'{self.team_name} Team', font_size = '40')
+        if (self.team_name == common.GREEN_TEAM):
+            self.label.color = (0,1,0,1)
+        if(self.team_name == common.RED_TEAM):
+            self.label.color = '#D30000'
+        self.add_widget(self.label)
+
+
+
 
         # add all the rows
         for i in range(self.row_count):
             row = BoxLayout(orientation='horizontal')
-            player_id_input = TextInput(hint_text='Player ID...', multiline=False, size_hint=(0.3, None), height=40, input_filter='int', on_text_validate=self.try_autocomplete)
+            player_id_input = TextInput(hint_text='Player ID...', multiline=False, size_hint=(0.5, None), height=50, input_filter='int', on_text_validate=self.try_autocomplete)
             player_id_input.row = i
-            code_name_input = TextInput(hint_text='Code Name...', multiline=False, size_hint=(0.4, None), height=40, on_text_validate=self.handle_submit)
+            code_name_input = TextInput(hint_text='Code Name...', multiline=False, size_hint=(0.5, None), height=50, on_text_validate=self.handle_submit)
             code_name_input.row = i
-            edit_button = Button(text='Edit', size_hint=(0.3, None), height=40)
+            edit_button = Button(text='Edit', size_hint=(0.2, None), height=50)
             edit_button.bind(on_release=self.handle_submit)
             edit_button.row = i
 
@@ -116,7 +126,7 @@ class PlayerEntryColumn(BoxLayout):
         players = self.get_all_players_from_rows()
         error = False
         for i in range(len(players)):
-            if (players[i][0] == int(current_player_id_input.text)) and i != self.current_player:
+            if (players[i].player_id == int(current_player_id_input.text)) and i != self.current_player:
                 current_code_name_input.text = ''
                 current_code_name_input.hint_text = 'Code Name...'
                 current_player_id_input.text = ''
@@ -151,7 +161,7 @@ class PlayerEntryColumn(BoxLayout):
             self.laser_tag_system.udp.broadcast(equipment_id)
             self.equipment_id_popup.dismiss()
 
-    def get_all_players_from_rows(self) -> list[common.Player]:
+    def get_all_players_from_rows(self) -> list[Player]:
         """
         Gets all the player info from the rows and converts it into useable data
 
@@ -164,9 +174,9 @@ class PlayerEntryColumn(BoxLayout):
         for i in range(len(self.rows)):
             player_id_input, code_name_input = self.rows[i]
             if player_id_input.text != '' and code_name_input.text != '':
-                players.append((int(player_id_input.text), self.equipment_ids[i], code_name_input.text))
+                players.append(Player(player_id=int(player_id_input.text), equipment_id=self.equipment_ids[i], codename=code_name_input.text, team=self.team_name))
         return players
-
+    
     def set_system(self, system):
         """
         Sets the main system to make global calls to the other parts of the code
@@ -174,6 +184,7 @@ class PlayerEntryColumn(BoxLayout):
         Args:
             system: the main LaserTagSystem from main.py
         """
+
         self.laser_tag_system = system
 
 class PlayerEntryScreen(Screen):
@@ -183,7 +194,10 @@ class PlayerEntryScreen(Screen):
     This allows for the team's players to be entered into the system.
     """
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        super(PlayerEntryScreen, self).__init__(**kwargs)
+        self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
+        self._keyboard.bind(on_key_down=self._on_keyboard_down)
+
         self.laser_tag_system: LaserTagSystem = None
 
         root = BoxLayout(orientation='vertical')
@@ -193,12 +207,13 @@ class PlayerEntryScreen(Screen):
         
         # create red team table
         self.red_team = PlayerEntryColumn(team_name=common.RED_TEAM)
-        red_team_layout = BoxLayout(orientation='horizontal', spacing=100)
+        red_team_layout = BoxLayout(orientation='horizontal', spacing=100, padding = 80)
         red_team_layout.add_widget(self.red_team)
+
 
         # create green team table
         self.green_team = PlayerEntryColumn(team_name=common.GREEN_TEAM)
-        green_team_layout = BoxLayout(orientation='horizontal', spacing=100)
+        green_team_layout = BoxLayout(orientation='horizontal', spacing=100,padding = 80)
         green_team_layout.add_widget(self.green_team)
 
         tables.add_widget(red_team_layout)
@@ -207,12 +222,12 @@ class PlayerEntryScreen(Screen):
         root.add_widget(tables)
 
         # create the button row
-        buttons = BoxLayout(orientation='horizontal', height=100, size_hint_y=None)
+        buttons = BoxLayout(orientation='horizontal', height=100, size_hint_y=None, spacing = 50)
 
-        clear_button = Button(text='Clear Names', size_hint=(None, None), height=80)
+        clear_button = Button(text='Clear Names', size_hint=(None, None), height=100,text_size = (self.width, self.height), color = (0,1,0,1))
         clear_button.bind(on_release=self.clear_names)
 
-        start_button = Button(text='Start Game', size_hint=(None, None), height=80)
+        start_button = Button(text='Start Game', size_hint=(None, None), height=100,text_size = (self.width, self.height), color = (0,1,0,1))
         start_button.bind(on_release=self.start_game)
 
         buttons.add_widget(clear_button)
@@ -221,17 +236,6 @@ class PlayerEntryScreen(Screen):
         root.add_widget(buttons)
 
         self.add_widget(root)
-
-    def set_system(self, system):
-        """
-        Sets the main system to make global calls to the other parts of the code
-
-        Args:
-            system: the main LaserTagSystem from main.py
-        """
-        self.laser_tag_system = system
-        self.red_team.set_system(system)
-        self.green_team.set_system(system)
 
     def clear_names(self, instance: Widget):
         """
@@ -253,10 +257,10 @@ class PlayerEntryScreen(Screen):
         error = False
         for red_player in red_players:
             for green_player in green_players:
-                if red_player[0] == green_player[0]:
+                if red_player.player_id == green_player.player_id:
                     self.laser_tag_system.show_error('There are duplicate players between the teams! FIX IT')
                     error = True
-                if red_player[1] == green_player[1]:
+                if red_player.equipment_id == green_player.equipment_id:
                     self.laser_tag_system.show_error('There are duplicate equipment IDs between the teams! FIX IT')
                     error = True
 
@@ -265,4 +269,41 @@ class PlayerEntryScreen(Screen):
             self.laser_tag_system.players[common.GREEN_TEAM] = green_players
 
             self.laser_tag_system.switch_screen(common.COUNTDOWN_SCREEN)
-        
+    
+    def set_system(self, system):
+        """
+        Sets the main system to make global calls to the other parts of the code
+
+        Args:
+            system: the main LaserTagSystem from main.py
+        """
+
+        self.laser_tag_system = system
+        self.red_team.set_system(system=system)
+        self.green_team.set_system(system=system)
+
+    def _keyboard_closed(self):
+        print('keyboard closed!')
+        # self._keyboard.unbind(on_key_down=self._on_keyboard_down) ##fricked up here
+        # self._keyboard = None
+
+    def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
+        # print('The key', keycode, 'have been pressed')
+        # print(' - text is %r' % text)
+        # print(' - modifiers are %r' % modifiers)
+
+        # Keycode is composed of an integer + a string
+        # If we hit escape, release the keyboard
+        if keycode[1] == 'escape':
+            self._keyboard.unbind(on_key_down=self._on_keyboard_down) ##fricked up here
+            self._keyboard = None
+            keyboard.release()
+        if keycode[1] == 'f5':
+            print('we in')
+            self.start_game(None)
+        if keycode[1] == 'f12':
+            self.clear_names(None)
+
+        # Return True to accept the key. Otherwise, it will be used by
+        # the system.
+        return True

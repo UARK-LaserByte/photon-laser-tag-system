@@ -4,7 +4,7 @@ src/screens/splash_screen.py
 See description below.
 
 by Cindy Nguyen, Alex Prosser
-10/9/2023
+10/22/2023
 """
 
 from kivy.clock import Clock

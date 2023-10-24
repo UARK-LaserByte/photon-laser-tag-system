@@ -4,7 +4,7 @@ src/udp.py
 See description below.
 
 by Alex Prosser
-10/9/2023
+10/22/2023
 """
 
 import socket
@@ -20,7 +20,7 @@ class UDP():
         # Create a UDP sockets
         self.socket_receive = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.socket_broadcast = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.socket_broadcast.settimeout(1)
+        self.socket_receive.settimeout(0.1) # Stop trying after 0.1 seconds to run other code
 
         # Bind receive UDP to localhost:7501 
         self.socket_receive.bind((common.URL_LOCALHOST, common.PORT_SOCKET_RECEIVE))

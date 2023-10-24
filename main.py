@@ -5,7 +5,7 @@ This is the main application where we actually use all the code to create the ap
 Right now, it isn't super complicated as we are on Sprint #3, which doesn't implement the full thing yet.
 
 by Alex Prosser, Jackson Morawski
-10/9/2023
+10/22/2023
 """
 
 # kivy imports
@@ -22,8 +22,9 @@ from kivy.uix.widget import Widget
 from src import common
 from src.database import Supabase
 from src.udp import UDP
-from src.screens.player_entry_screen import PlayerEntryScreen
+from src.models.player import Player
 from src.screens.splash_screen import SplashScreen
+from src.screens.player_entry_screen import PlayerEntryScreen
 from src.screens.countdown_screen import CountdownScreen
 from src.screens.player_action_screen import PlayerActionScreen
 
@@ -46,18 +47,19 @@ class LaserTagSystem(App):
         self.udp = UDP()
 
         # state management system
-        self.players: dict[str, list[common.Player]] = { common.RED_TEAM: [], common.GREEN_TEAM: [] }
+        self.players: dict[str, list[Player]] = { common.RED_TEAM: [], common.GREEN_TEAM: [] }
 
         # create main screen manager and add all current screens to it
         self.screen_manager = ScreenManager()
 
         self.splash_screen = SplashScreen(name=common.SPLASH_SCREEN)
-        self.splash_screen.set_system(self)
         self.player_entry_screen = PlayerEntryScreen(name=common.PLAYER_ENTRY_SCREEN)
-        self.player_entry_screen.set_system(self)
         self.countdown_screen = CountdownScreen(name=common.COUNTDOWN_SCREEN)
-        self.countdown_screen.set_system(self)
         self.player_action_screen = PlayerActionScreen(name=common.PLAYER_ACTION_SCREEN)
+
+        self.splash_screen.set_system(self)
+        self.player_entry_screen.set_system(self)
+        self.countdown_screen.set_system(self)
         self.player_action_screen.set_system(self)
         
         self.screen_manager.add_widget(self.splash_screen)
@@ -94,7 +96,7 @@ class LaserTagSystem(App):
         # set splash screen as first screen to be displayed
         self.switch_screen(common.SPLASH_SCREEN)
 
-    def get_player_by_equipment_id(self, id: int) -> tuple[common.Player, bool] | None:
+    def get_player_by_equipment_id(self, id: int) -> Player | None:
         """
         Get a player from the current global state by their equipment id.
 
@@ -102,18 +104,18 @@ class LaserTagSystem(App):
             id: equipment id used to search
 
         Returns:
-            tuple with Player and team (True for red, False for green) if found; None if no player found 
+            Player if found; None if no player found 
         """
 
         # search red players
         for red_player in self.players[common.RED_TEAM]:
-            if red_player[1] == id:
-                return (red_player, True)
+            if red_player.equipment_id == id:
+                return red_player
             
         # search green players
         for green_player in self.players[common.GREEN_TEAM]:
-            if green_player[1] == id:
-                return (green_player, False)
+            if green_player.equipment_id == id:
+                return green_player
 
         return None 
 
@@ -165,5 +167,5 @@ class LaserTagSystem(App):
 laser_tag_system = LaserTagSystem()
 
 # run app if we are running the file itself
-if __name__ == "__main__":
+if __name__ == '__main__':
     laser_tag_system.run()
