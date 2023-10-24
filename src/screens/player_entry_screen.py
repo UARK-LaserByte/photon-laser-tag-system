@@ -40,16 +40,24 @@ class PlayerEntryColumn(BoxLayout):
 
         # setup root ui
         self.orientation = 'vertical'
-        self.add_widget(Label(text=f'{self.team_name} Team'))
+        self.label = Label(text=f'{self.team_name} Team', font_size = '40')
+        if (self.team_name == common.GREEN_TEAM):
+            self.label.color = (0,1,0,1)
+        if(self.team_name == common.RED_TEAM):
+            self.label.color = '#D30000'
+        self.add_widget(self.label)
+
+
+
 
         # add all the rows
         for i in range(self.row_count):
             row = BoxLayout(orientation='horizontal')
-            player_id_input = TextInput(hint_text='Player ID...', multiline=False, size_hint=(0.3, None), height=40, input_filter='int', on_text_validate=self.try_autocomplete)
+            player_id_input = TextInput(hint_text='Player ID...', multiline=False, size_hint=(0.5, None), height=50, input_filter='int', on_text_validate=self.try_autocomplete)
             player_id_input.row = i
-            code_name_input = TextInput(hint_text='Code Name...', multiline=False, size_hint=(0.4, None), height=40, on_text_validate=self.handle_submit)
+            code_name_input = TextInput(hint_text='Code Name...', multiline=False, size_hint=(0.5, None), height=50, on_text_validate=self.handle_submit)
             code_name_input.row = i
-            edit_button = Button(text='Edit', size_hint=(0.3, None), height=40)
+            edit_button = Button(text='Edit', size_hint=(0.2, None), height=50)
             edit_button.bind(on_release=self.handle_submit)
             edit_button.row = i
 
@@ -195,12 +203,13 @@ class PlayerEntryScreen(Screen):
         
         # create red team table
         self.red_team = PlayerEntryColumn(team_name=common.RED_TEAM)
-        red_team_layout = BoxLayout(orientation='horizontal', spacing=100)
+        red_team_layout = BoxLayout(orientation='horizontal', spacing=100, padding = 80)
         red_team_layout.add_widget(self.red_team)
+
 
         # create green team table
         self.green_team = PlayerEntryColumn(team_name=common.GREEN_TEAM)
-        green_team_layout = BoxLayout(orientation='horizontal', spacing=100)
+        green_team_layout = BoxLayout(orientation='horizontal', spacing=100,padding = 80)
         green_team_layout.add_widget(self.green_team)
 
         tables.add_widget(red_team_layout)
@@ -209,12 +218,12 @@ class PlayerEntryScreen(Screen):
         root.add_widget(tables)
 
         # create the button row
-        buttons = BoxLayout(orientation='horizontal', height=100, size_hint_y=None)
+        buttons = BoxLayout(orientation='horizontal', height=100, size_hint_y=None, spacing = 50)
 
-        clear_button = Button(text='Clear Names', size_hint=(None, None), height=80)
+        clear_button = Button(text='Clear Names', size_hint=(None, None), height=100,text_size = (self.width, self.height), color = (0,1,0,1))
         clear_button.bind(on_release=self.clear_names)
 
-        start_button = Button(text='Start Game', size_hint=(None, None), height=80)
+        start_button = Button(text='Start Game', size_hint=(None, None), height=100,text_size = (self.width, self.height), color = (0,1,0,1))
         start_button.bind(on_release=self.start_game)
 
         buttons.add_widget(clear_button)
@@ -268,4 +277,3 @@ class PlayerEntryScreen(Screen):
         self.laser_tag_system = system
         self.red_team.set_system(system=system)
         self.green_team.set_system(system=system)
-        
