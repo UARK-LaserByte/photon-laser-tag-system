@@ -28,7 +28,8 @@ class CountdownScreen(Screen):
         super().__init__(**kwargs)
         self.laser_tag_system: LaserTagSystem = None
 
-        self.time_left = 5
+        self.countdown_value = 5
+        self.time_left = self.countdown_value
 
         # create the root UI and add label and basic timer for now
         root = BoxLayout(orientation='vertical')
@@ -58,7 +59,8 @@ class CountdownScreen(Screen):
 
         # switch when the timer reaches 0
         if self.time_left <= 0:
-            self.time_left = 0
+            # reset for future games
+            self.time_left = self.countdown_value
             Clock.unschedule(self.timer_event)
             self.laser_tag_system.switch_screen(common.PLAYER_ACTION_SCREEN)
 

@@ -35,7 +35,7 @@ class PlayerActionScreen(Screen):
         self.laser_tag_system: LaserTagSystem = None
 
         self.game_running = True
-        self.game_time = 10
+        self.game_time = 10 # switch to 360 for final submission
 
         root = BoxLayout(orientation='vertical')
 
@@ -123,6 +123,9 @@ class PlayerActionScreen(Screen):
             # send game end signal
             for _ in range(3):
                 self.laser_tag_system.udp.broadcast(common.UDP_GAME_END)
+
+            # end game loop
+            self.laser_tag_system.switch_screen(common.PLAYER_ENTRY_SCREEN)
 
     def update_players(self):
         """
