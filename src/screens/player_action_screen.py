@@ -8,6 +8,7 @@ by Eric Lee, Alex Prosser
 """
 
 import time
+import random
 
 from kivy.clock import Clock
 from kivy.uix.screenmanager import Screen
@@ -89,6 +90,7 @@ class PlayerActionScreen(Screen):
         self.update_players()
         self.game_running = True
         self.chat_logs.text = ""
+        random.choice(self.laser_tag_system.music).play()
 
         self.game_loop = Clock.schedule_interval(self.run_game_loop, 0.1)
 
@@ -103,8 +105,10 @@ class PlayerActionScreen(Screen):
 
         # if there is no errors, process the signal
         if results != None:
-            hitter = self.laser_tag_system.get_player_by_equipment_id(id=results[0])
-            hittee = self.laser_tag_system.get_player_by_equipment_id(id=results[1])
+            hitter = self.laser_tag_system.get_player_by_equipment_id(
+                id=results[0])
+            hittee = self.laser_tag_system.get_player_by_equipment_id(
+                id=results[1])
 
             # Check if a green player has scored on red base
             if (
@@ -234,7 +238,8 @@ class PlayerActionScreen(Screen):
 
     def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
         if keycode[1] == "escape":
-            self._keyboard.unbind(on_key_down=self._on_keyboard_down)  ##fricked up here
+            self._keyboard.unbind(
+                on_key_down=self._on_keyboard_down)  # fricked up here
             self._keyboard = None
             keyboard.release()
         if keycode[1] == "f5" and not self.game_running:

@@ -16,6 +16,7 @@ from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.button import Button
 from kivy.uix.widget import Widget
+from kivy.core.audio import SoundLoader
 
 # own imports
 from src import common
@@ -26,6 +27,7 @@ from src.screens.splash_screen import SplashScreen
 from src.screens.player_entry_screen import PlayerEntryScreen
 from src.screens.countdown_screen import CountdownScreen
 from src.screens.player_action_screen import PlayerActionScreen
+
 
 # hide window so it doesn't look as weird
 Window.hide()
@@ -46,6 +48,8 @@ class LaserTagSystem(App):
         # other systems
         self.supabase = Supabase()
         self.udp = UDP()
+        self.music = [SoundLoader.load(
+            "resources/Track01.mp3"), SoundLoader.load("resources/Track01.mp3"), SoundLoader.load("resources/Track02.mp3"), SoundLoader.load("resources/Track03.mp3"), SoundLoader.load("resources/Track04.mp3"), SoundLoader.load("resources/Track05.mp3"), SoundLoader.load("resources/Track06.mp3"), SoundLoader.load("resources/Track07.mp3"), SoundLoader.load("resources/Track08.mp3")]
 
         # state management system
         self.players: dict[str, list[Player]] = {
@@ -57,9 +61,11 @@ class LaserTagSystem(App):
         self.screen_manager = ScreenManager()
 
         self.splash_screen = SplashScreen(name=common.SPLASH_SCREEN)
-        self.player_entry_screen = PlayerEntryScreen(name=common.PLAYER_ENTRY_SCREEN)
+        self.player_entry_screen = PlayerEntryScreen(
+            name=common.PLAYER_ENTRY_SCREEN)
         self.countdown_screen = CountdownScreen(name=common.COUNTDOWN_SCREEN)
-        self.player_action_screen = PlayerActionScreen(name=common.PLAYER_ACTION_SCREEN)
+        self.player_action_screen = PlayerActionScreen(
+            name=common.PLAYER_ACTION_SCREEN)
 
         self.splash_screen.set_system(self)
         self.player_entry_screen.set_system(self)
@@ -97,7 +103,8 @@ class LaserTagSystem(App):
         Window.show()
 
         # setup handlers for input and database
-        self.keyboard_manager = Window.request_keyboard(self.close_keyboard, self.root)
+        self.keyboard_manager = Window.request_keyboard(
+            self.close_keyboard, self.root)
 
         # set splash screen as first screen to be displayed
         self.switch_screen(common.SPLASH_SCREEN)
