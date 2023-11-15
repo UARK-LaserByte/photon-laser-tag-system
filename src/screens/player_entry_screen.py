@@ -3,8 +3,8 @@ src/screens/player_entry_screen.py
 
 See description below.
 
-by Eric Lee, Alex Prosser
-10/22/2023
+by Eric Lee, Alex Prosser, Jackson Morawski
+11/14/2023
 """
 
 from typing import TYPE_CHECKING
@@ -22,12 +22,14 @@ from kivy.core.window import Window
 if TYPE_CHECKING:
     from main import LaserTagSystem
 
+
 class PlayerEntryColumn(BoxLayout):
     """
     A column for part of the PlayerEntryScreen.
 
-    Takes all the input and stores it in the global state to be used by other parts of the application. 
+    Takes all the input and stores it in the global state to be used by other parts of the application.
     """
+
     def __init__(self, team_name: str):
         super().__init__()
         self.laser_tag_system: LaserTagSystem = None
@@ -40,25 +42,35 @@ class PlayerEntryColumn(BoxLayout):
         self.current_player: int = -1
 
         # setup root ui
-        self.orientation = 'vertical'
-        self.label = Label(text=f'{self.team_name} Team', font_size = '40')
-        if (self.team_name == common.GREEN_TEAM):
-            self.label.color = (0,1,0,1)
-        if(self.team_name == common.RED_TEAM):
-            self.label.color = '#D30000'
+        self.orientation = "vertical"
+        self.label = Label(text=f"{self.team_name} Team", font_size="40")
+        if self.team_name == common.GREEN_TEAM:
+            self.label.color = (0, 1, 0, 1)
+        if self.team_name == common.RED_TEAM:
+            self.label.color = "#D30000"
         self.add_widget(self.label)
-
-
-
 
         # add all the rows
         for i in range(self.row_count):
-            row = BoxLayout(orientation='horizontal')
-            player_id_input = TextInput(hint_text='Player ID...', multiline=False, size_hint=(0.5, None), height=50, input_filter='int', on_text_validate=self.try_autocomplete)
+            row = BoxLayout(orientation="horizontal")
+            player_id_input = TextInput(
+                hint_text="Player ID...",
+                multiline=False,
+                size_hint=(0.5, None),
+                height=50,
+                input_filter="int",
+                on_text_validate=self.try_autocomplete,
+            )
             player_id_input.row = i
-            code_name_input = TextInput(hint_text='Code Name...', multiline=False, size_hint=(0.5, None), height=50, on_text_validate=self.handle_submit)
+            code_name_input = TextInput(
+                hint_text="Code Name...",
+                multiline=False,
+                size_hint=(0.5, None),
+                height=50,
+                on_text_validate=self.handle_submit,
+            )
             code_name_input.row = i
-            edit_button = Button(text='Edit', size_hint=(0.2, None), height=50)
+            edit_button = Button(text="Edit", size_hint=(0.2, None), height=50)
             edit_button.bind(on_release=self.handle_submit)
             edit_button.row = i
 
@@ -70,27 +82,34 @@ class PlayerEntryColumn(BoxLayout):
             self.add_widget(row)
 
         # create equipment id popup
-        equipment_id_content = BoxLayout(orientation='vertical')
-        
-        self.equipment_id_input = TextInput(hint_text='Equipment ID...', multiline=False, input_filter='int', on_text_validate=self.send_equipment_id)
-        equipment_id_button = Button(text='Submit', size_hint_y = None, height = 40)
-        equipment_id_button.bind(on_release=self.send_equipment_id)
-        self.equipment_id_error = Label(text='')
+        equipment_id_content = BoxLayout(orientation="vertical")
 
-        equipment_id_content.add_widget(Label(text='What equipment ID?:'))
+        self.equipment_id_input = TextInput(
+            hint_text="Equipment ID...",
+            multiline=False,
+            input_filter="int",
+            on_text_validate=self.send_equipment_id,
+        )
+        equipment_id_button = Button(text="Submit", size_hint_y=None, height=40)
+        equipment_id_button.bind(on_release=self.send_equipment_id)
+        self.equipment_id_error = Label(text="")
+
+        equipment_id_content.add_widget(Label(text="What equipment ID?:"))
         equipment_id_content.add_widget(self.equipment_id_input)
         equipment_id_content.add_widget(self.equipment_id_error)
         equipment_id_content.add_widget(equipment_id_button)
-        self.equipment_id_popup = Popup(title='Set Equipment ID', content=equipment_id_content, size_hint=(0.5, 0.4))
+        self.equipment_id_popup = Popup(
+            title="Set Equipment ID", content=equipment_id_content, size_hint=(0.5, 0.4)
+        )
 
     def clear_table(self):
         """
         Clears all rows and resets the text back
         """
         for player_id_input, code_name_input in self.rows:
-            player_id_input.text = ''
-            code_name_input.text = ''
-            code_name_input.hint_text = 'Code Name...'
+            player_id_input.text = ""
+            code_name_input.text = ""
+            code_name_input.hint_text = "Code Name..."
 
     def try_autocomplete(self, instance: Widget):
         """
@@ -103,14 +122,14 @@ class PlayerEntryColumn(BoxLayout):
         Also moves the current focus to the code name input
         """
         current_code_name_input: TextInput = self.rows[instance.row][1]
-        current_code_name_input.hint_text = 'Searching...'
+        current_code_name_input.hint_text = "Searching..."
 
         player = self.laser_tag_system.supabase.get_player_by_id(id=int(instance.text))
-        self.create_mode = (player == None)
+        self.create_mode = player == None
         if self.create_mode:
-            current_code_name_input.hint_text = 'None found! Please enter new name...'
+            current_code_name_input.hint_text = "None found! Please enter new name..."
         else:
-            current_code_name_input.text = player['codename']
+            current_code_name_input.text = player["codename"]
 
         current_code_name_input.focus = True
 
@@ -126,21 +145,29 @@ class PlayerEntryColumn(BoxLayout):
         players = self.get_all_players_from_rows()
         error = False
         for i in range(len(players)):
-            if (players[i].player_id == int(current_player_id_input.text)) and i != self.current_player:
-                current_code_name_input.text = ''
-                current_code_name_input.hint_text = 'Code Name...'
-                current_player_id_input.text = ''
+            if (
+                players[i].player_id == int(current_player_id_input.text)
+            ) and i != self.current_player:
+                current_code_name_input.text = ""
+                current_code_name_input.hint_text = "Code Name..."
+                current_player_id_input.text = ""
 
-                self.laser_tag_system.show_error('Player already exists!')
+                self.laser_tag_system.show_error("Player already exists!")
                 error = True
                 break
 
         # either adds a player's name or update's a players name
         if not error:
             if self.create_mode:
-                self.laser_tag_system.supabase.create_player(id=int(current_player_id_input.text), codename=current_code_name_input.text)
+                self.laser_tag_system.supabase.create_player(
+                    id=int(current_player_id_input.text),
+                    codename=current_code_name_input.text,
+                )
             else:
-                self.laser_tag_system.supabase.update_player(id=int(current_player_id_input.text), codename=current_code_name_input.text)
+                self.laser_tag_system.supabase.update_player(
+                    id=int(current_player_id_input.text),
+                    codename=current_code_name_input.text,
+                )
 
             self.equipment_id_input.focus = True
             self.equipment_id_input.text = str(self.equipment_ids[self.current_player])
@@ -155,7 +182,9 @@ class PlayerEntryColumn(BoxLayout):
         equipment_id = int(self.equipment_id_input.text)
 
         if equipment_id in self.equipment_ids:
-            self.equipment_id_error.text = 'A player is already attached to this equipment ID!'
+            self.equipment_id_error.text = (
+                "A player is already attached to this equipment ID!"
+            )
         else:
             self.equipment_ids[self.current_player] = equipment_id
             self.laser_tag_system.udp.broadcast(equipment_id)
@@ -173,10 +202,17 @@ class PlayerEntryColumn(BoxLayout):
         players = []
         for i in range(len(self.rows)):
             player_id_input, code_name_input = self.rows[i]
-            if player_id_input.text != '' and code_name_input.text != '':
-                players.append(Player(player_id=int(player_id_input.text), equipment_id=self.equipment_ids[i], codename=code_name_input.text, team=self.team_name))
+            if player_id_input.text != "" and code_name_input.text != "":
+                players.append(
+                    Player(
+                        player_id=int(player_id_input.text),
+                        equipment_id=self.equipment_ids[i],
+                        codename=code_name_input.text,
+                        team=self.team_name,
+                    )
+                )
         return players
-    
+
     def set_system(self, system):
         """
         Sets the main system to make global calls to the other parts of the code
@@ -187,12 +223,14 @@ class PlayerEntryColumn(BoxLayout):
 
         self.laser_tag_system = system
 
+
 class PlayerEntryScreen(Screen):
     """
     The player entry screen for the Photon Laser Tag System App.
 
     This allows for the team's players to be entered into the system.
     """
+
     def __init__(self, **kwargs):
         super(PlayerEntryScreen, self).__init__(**kwargs)
         self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
@@ -200,20 +238,19 @@ class PlayerEntryScreen(Screen):
 
         self.laser_tag_system: LaserTagSystem = None
 
-        root = BoxLayout(orientation='vertical')
+        root = BoxLayout(orientation="vertical")
 
         # create the tables sections
-        tables = BoxLayout(orientation='horizontal')
-        
+        tables = BoxLayout(orientation="horizontal")
+
         # create red team table
         self.red_team = PlayerEntryColumn(team_name=common.RED_TEAM)
-        red_team_layout = BoxLayout(orientation='horizontal', spacing=100, padding = 80)
+        red_team_layout = BoxLayout(orientation="horizontal", spacing=100, padding=80)
         red_team_layout.add_widget(self.red_team)
-
 
         # create green team table
         self.green_team = PlayerEntryColumn(team_name=common.GREEN_TEAM)
-        green_team_layout = BoxLayout(orientation='horizontal', spacing=100,padding = 80)
+        green_team_layout = BoxLayout(orientation="horizontal", spacing=100, padding=80)
         green_team_layout.add_widget(self.green_team)
 
         tables.add_widget(red_team_layout)
@@ -222,12 +259,26 @@ class PlayerEntryScreen(Screen):
         root.add_widget(tables)
 
         # create the button row
-        buttons = BoxLayout(orientation='horizontal', height=100, size_hint_y=None, spacing = 50)
+        buttons = BoxLayout(
+            orientation="horizontal", height=100, size_hint_y=None, spacing=50
+        )
 
-        clear_button = Button(text='Clear Names', size_hint=(None, None), height=100,text_size = (self.width, self.height), color = (0,1,0,1))
+        clear_button = Button(
+            text="Clear Names",
+            size_hint=(None, None),
+            height=100,
+            text_size=(self.width, self.height),
+            color=(0, 1, 0, 1),
+        )
         clear_button.bind(on_release=self.clear_names)
 
-        start_button = Button(text='Start Game', size_hint=(None, None), height=100,text_size = (self.width, self.height), color = (0,1,0,1))
+        start_button = Button(
+            text="Start Game",
+            size_hint=(None, None),
+            height=100,
+            text_size=(self.width, self.height),
+            color=(0, 1, 0, 1),
+        )
         start_button.bind(on_release=self.start_game)
 
         buttons.add_widget(clear_button)
@@ -248,7 +299,7 @@ class PlayerEntryScreen(Screen):
         """
         Gets all the players from both teams and sends them to global data
 
-        Also checks for duplicates in player and equipment IDs and throws error if found 
+        Also checks for duplicates in player and equipment IDs and throws error if found
         """
         red_players = self.red_team.get_all_players_from_rows()
         green_players = self.green_team.get_all_players_from_rows()
@@ -258,10 +309,14 @@ class PlayerEntryScreen(Screen):
         for red_player in red_players:
             for green_player in green_players:
                 if red_player.player_id == green_player.player_id:
-                    self.laser_tag_system.show_error('There are duplicate players between the teams! FIX IT')
+                    self.laser_tag_system.show_error(
+                        "There are duplicate players between the teams! FIX IT"
+                    )
                     error = True
                 if red_player.equipment_id == green_player.equipment_id:
-                    self.laser_tag_system.show_error('There are duplicate equipment IDs between the teams! FIX IT')
+                    self.laser_tag_system.show_error(
+                        "There are duplicate equipment IDs between the teams! FIX IT"
+                    )
                     error = True
 
         if not error:
@@ -269,7 +324,7 @@ class PlayerEntryScreen(Screen):
             self.laser_tag_system.players[common.GREEN_TEAM] = green_players
 
             self.laser_tag_system.switch_screen(common.COUNTDOWN_SCREEN)
-    
+
     def set_system(self, system):
         """
         Sets the main system to make global calls to the other parts of the code
@@ -283,7 +338,7 @@ class PlayerEntryScreen(Screen):
         self.green_team.set_system(system=system)
 
     def _keyboard_closed(self):
-        print('keyboard closed!')
+        print("keyboard closed!")
         # self._keyboard.unbind(on_key_down=self._on_keyboard_down) ##fricked up here
         # self._keyboard = None
 
@@ -294,14 +349,13 @@ class PlayerEntryScreen(Screen):
 
         # Keycode is composed of an integer + a string
         # If we hit escape, release the keyboard
-        if keycode[1] == 'escape':
-            self._keyboard.unbind(on_key_down=self._on_keyboard_down) ##fricked up here
+        if keycode[1] == "escape":
+            self._keyboard.unbind(on_key_down=self._on_keyboard_down)  ##fricked up here
             self._keyboard = None
             keyboard.release()
-        if keycode[1] == 'f5':
-            print('we in')
+        if keycode[1] == "f5":
             self.start_game(None)
-        if keycode[1] == 'f12':
+        if keycode[1] == "f12":
             self.clear_names(None)
 
         # Return True to accept the key. Otherwise, it will be used by

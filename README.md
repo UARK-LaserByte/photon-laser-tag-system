@@ -3,7 +3,7 @@
 The main project repository for CSCE 3513 - Software Engineering. This contains all the source code and (maybe) an executable for all distributions of the software. Right now, it is still being developed, but a road map of features will be included to show where we are at.
 
 #### by LaserByte - Team 8
-##### Last updated 10/22/2023
+##### Last updated 11/14/2023
 
 ## How to use
 
@@ -22,6 +22,10 @@ Here are the libraries used:
 Then, download and put `.env` from the Slack into the root folder.
 
 Finally, run the program using `python main.py`
+
+### Testing
+
+If you want to use our traffic generator, please use [this repo](https://github.com/UARK-LaserByte/udp-tests) as it allows for better testing (or you can use your own if you want because it just needs traffic on the UDP ports)
 
 ## Road Map
 
@@ -42,6 +46,12 @@ Finally, run the program using `python main.py`
 - Finishing UDP interactions
 - Finishing the design document
 - Standardizing the UI for the entire application
+
+**Sprint #4**:
+- Finishing the project
+- Adding UI tweaks
+- Make the game loop
+- Fix any bugs
 
 ## Design Document
 
