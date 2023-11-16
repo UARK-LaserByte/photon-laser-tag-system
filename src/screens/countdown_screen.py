@@ -18,12 +18,14 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from main import LaserTagSystem
 
+
 class CountdownScreen(Screen):
     """
     The countdown screen shows a timer, then moves the player action screen.
-    
+
     This is built off of Kivy's built-in Screen system.
     """
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.laser_tag_system: LaserTagSystem = None
@@ -32,13 +34,13 @@ class CountdownScreen(Screen):
         self.time_left = self.countdown_value
 
         # create the root UI and add label and basic timer for now
-        root = BoxLayout(orientation='vertical')
-        
-        self.timer_label = Label(text=f'Time Remaining: {self.time_left} seconds')
-        
-        root.add_widget(Label(text='Countdown Screen'))
+        root = BoxLayout(orientation="vertical")
+
+        self.timer_label = Label(text=f"Time Remaining: {self.time_left} seconds")
+
+        root.add_widget(Label(text="Countdown Screen"))
         root.add_widget(self.timer_label)
-        
+
         self.add_widget(root)
 
     def on_enter(self):
@@ -64,7 +66,7 @@ class CountdownScreen(Screen):
             Clock.unschedule(self.timer_event)
             self.laser_tag_system.switch_screen(common.PLAYER_ACTION_SCREEN)
 
-        self.timer_label.text = f'Time Remaining: {self.time_left} seconds'
+        self.timer_label.text = f"Time Remaining: {self.time_left} seconds"
 
     def set_system(self, system):
         """
@@ -75,3 +77,4 @@ class CountdownScreen(Screen):
         """
 
         self.laser_tag_system = system
+        

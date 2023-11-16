@@ -3,8 +3,8 @@ src/screens/player_action_screen.py
 
 See description below.
 
-by Eric Lee, Alex Prosser
-11/14/2023
+by Eric Lee, Alex Prosser, Isabella Martinez
+11/16/2023
 """
 
 import time
@@ -105,10 +105,8 @@ class PlayerActionScreen(Screen):
 
         # if there is no errors, process the signal
         if results != None:
-            hitter = self.laser_tag_system.get_player_by_equipment_id(
-                id=results[0])
-            hittee = self.laser_tag_system.get_player_by_equipment_id(
-                id=results[1])
+            hitter = self.laser_tag_system.get_player_by_equipment_id(id=results[0])
+            hittee = self.laser_tag_system.get_player_by_equipment_id(id=results[1])
 
             # Check if a green player has scored on red base
             if (
@@ -182,7 +180,7 @@ class PlayerActionScreen(Screen):
             )
             red_player_row.add_widget(
                 Label(text=base, size_hint=(0.2, None))
-            )  # Base Indicator (not needed yet)
+            )  # Base Indicator
             red_player_row.add_widget(
                 Label(text=red_player.codename, size_hint=(0.6, None))
             )  # Name
@@ -213,7 +211,7 @@ class PlayerActionScreen(Screen):
             )
             green_player_row.add_widget(
                 Label(text=base, size_hint=(0.2, None))
-            )  # Base Indicator (not needed yet)
+            )  # Base Indicator
             green_player_row.add_widget(
                 Label(text=green_player.codename, size_hint=(0.6, None))
             )  # Name
@@ -238,15 +236,12 @@ class PlayerActionScreen(Screen):
 
     def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
         if keycode[1] == "escape":
-            self._keyboard.unbind(
-                on_key_down=self._on_keyboard_down)  # fricked up here
+            self._keyboard.unbind(on_key_down=self._on_keyboard_down)
             self._keyboard = None
             keyboard.release()
         if keycode[1] == "f5" and not self.game_running:
             self.laser_tag_system.switch_screen(common.PLAYER_ENTRY_SCREEN)
 
-        # Return True to accept the key. Otherwise, it will be used by
-        # the system.
         return True
 
     def set_system(self, system):

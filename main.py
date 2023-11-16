@@ -3,8 +3,8 @@ main.py
 
 This is the main application where we actually use all the code to create the application.
 
-by Alex Prosser, Jackson Morawski
-11/14/2023
+by Alex Prosser, Jackson Morawski, Isabella Martinez
+11/16/2023
 """
 
 # kivy imports
@@ -48,8 +48,17 @@ class LaserTagSystem(App):
         # other systems
         self.supabase = Supabase()
         self.udp = UDP()
-        self.music = [SoundLoader.load(
-            "resources/Track01.mp3"), SoundLoader.load("resources/Track01.mp3"), SoundLoader.load("resources/Track02.mp3"), SoundLoader.load("resources/Track03.mp3"), SoundLoader.load("resources/Track04.mp3"), SoundLoader.load("resources/Track05.mp3"), SoundLoader.load("resources/Track06.mp3"), SoundLoader.load("resources/Track07.mp3"), SoundLoader.load("resources/Track08.mp3")]
+        self.music = [
+            SoundLoader.load("resources/Track01.mp3"),
+            SoundLoader.load("resources/Track01.mp3"),
+            SoundLoader.load("resources/Track02.mp3"),
+            SoundLoader.load("resources/Track03.mp3"),
+            SoundLoader.load("resources/Track04.mp3"),
+            SoundLoader.load("resources/Track05.mp3"),
+            SoundLoader.load("resources/Track06.mp3"),
+            SoundLoader.load("resources/Track07.mp3"),
+            SoundLoader.load("resources/Track08.mp3"),
+        ]
 
         # state management system
         self.players: dict[str, list[Player]] = {
@@ -61,11 +70,9 @@ class LaserTagSystem(App):
         self.screen_manager = ScreenManager()
 
         self.splash_screen = SplashScreen(name=common.SPLASH_SCREEN)
-        self.player_entry_screen = PlayerEntryScreen(
-            name=common.PLAYER_ENTRY_SCREEN)
+        self.player_entry_screen = PlayerEntryScreen(name=common.PLAYER_ENTRY_SCREEN)
         self.countdown_screen = CountdownScreen(name=common.COUNTDOWN_SCREEN)
-        self.player_action_screen = PlayerActionScreen(
-            name=common.PLAYER_ACTION_SCREEN)
+        self.player_action_screen = PlayerActionScreen(name=common.PLAYER_ACTION_SCREEN)
 
         self.splash_screen.set_system(self)
         self.player_entry_screen.set_system(self)
@@ -103,8 +110,7 @@ class LaserTagSystem(App):
         Window.show()
 
         # setup handlers for input and database
-        self.keyboard_manager = Window.request_keyboard(
-            self.close_keyboard, self.root)
+        self.keyboard_manager = Window.request_keyboard(self.close_keyboard, self.root)
 
         # set splash screen as first screen to be displayed
         self.switch_screen(common.SPLASH_SCREEN)

@@ -19,19 +19,21 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from main import LaserTagSystem
 
+
 class SplashScreen(Screen):
     """
     The splash screen shows the photon logo for 3 seconds, then moves to the player entry screen.
 
     This is built off of Kivy's built-in Screen system.
     """
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.laser_tag_system: LaserTagSystem = None
 
         # create the root UI and add image
-        root = BoxLayout(orientation='vertical')
-        image = Image(source='resources/logo.jpg')
+        root = BoxLayout(orientation="vertical")
+        image = Image(source="resources/logo.jpg")
         fade_animation = Animation(opacity=0, duration=3)
         fade_animation.start(image)
 
