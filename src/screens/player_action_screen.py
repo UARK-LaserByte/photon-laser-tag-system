@@ -173,13 +173,13 @@ class PlayerActionScreen(Screen):
         ):
             base = ""
             if red_player.reached_base:
-                base = "B"
+                base = "[i]B[/i]"
 
             red_player_row = BoxLayout(
                 orientation="horizontal", size_hint_y=None, height=40
             )
             red_player_row.add_widget(
-                Label(text=base, size_hint=(0.2, None))
+                Label(text=base, size_hint=(0.2, None), markup = true)
             )  # Base Indicator
             red_player_row.add_widget(
                 Label(text=red_player.codename, size_hint=(0.6, None))
@@ -204,13 +204,13 @@ class PlayerActionScreen(Screen):
         ):
             base = ""
             if green_player.reached_base:
-                base = "B"
+                base = "[i]B[/i]"
 
             green_player_row = BoxLayout(
                 orientation="horizontal", size_hint_y=None, height=40
             )
             green_player_row.add_widget(
-                Label(text=base, size_hint=(0.2, None))
+                Label(text=base, size_hint=(0.2, None), markup = true)
             )  # Base Indicator
             green_player_row.add_widget(
                 Label(text=green_player.codename, size_hint=(0.6, None))
