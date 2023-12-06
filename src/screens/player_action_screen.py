@@ -179,7 +179,7 @@ class PlayerActionScreen(Screen):
                 orientation="horizontal", size_hint_y=None, height=40
             )
             red_player_row.add_widget(
-                Label(text=base, size_hint=(0.2, None), markup = true)
+                Label(text=base, size_hint=(0.2, None), markup = True)
             )  # Base Indicator
             red_player_row.add_widget(
                 Label(text=red_player.codename, size_hint=(0.6, None))
@@ -210,7 +210,7 @@ class PlayerActionScreen(Screen):
                 orientation="horizontal", size_hint_y=None, height=40
             )
             green_player_row.add_widget(
-                Label(text=base, size_hint=(0.2, None), markup = true)
+                Label(text=base, size_hint=(0.2, None), markup = True)
             )  # Base Indicator
             green_player_row.add_widget(
                 Label(text=green_player.codename, size_hint=(0.6, None))
